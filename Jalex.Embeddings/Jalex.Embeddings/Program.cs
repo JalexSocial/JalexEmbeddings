@@ -2,18 +2,16 @@
 using Jalex.Embeddings.Services;
 using Microsoft.Extensions.Configuration;
 using OpenAI_API;
-using Microsoft.SemanticKernel.SemanticFunctions.Partitioning;
-using OpenAI_API.Completions;
 using System.Text.Json;
 
 var builder = new ConfigurationBuilder()
-	.AddUserSecrets(typeof(Secrets).Assembly);
+    .AddUserSecrets(typeof(Secrets).Assembly);
 var configurationRoot = builder.Build();
 
 var secrets = configurationRoot.GetSection("OpenAI").Get<Secrets>();
 
 if (secrets is null)
-	throw new ArgumentException("Invalid secrets configuration");
+    throw new ArgumentException("Invalid secrets configuration");
 
 var filename = "handbook.md";
 var text = File.ReadAllLines(filename).ToList();
