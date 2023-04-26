@@ -51,7 +51,7 @@ while (true)
 	    Console.Write(message);
     }
 
-    Console.WriteLine();
+    Console.WriteLine("\n");
 }
 
 /*
