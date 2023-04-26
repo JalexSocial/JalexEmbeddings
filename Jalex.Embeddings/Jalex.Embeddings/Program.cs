@@ -34,6 +34,27 @@ if (!File.Exists(jsonFilename))
 	File.WriteAllText(jsonFilename, jsonString);
 }
 
+ChatService chatService = new ChatService(client, File.ReadAllLines("systemprompt.txt"));
+
+while (true)
+{
+	Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("Ask a question: ");
+	string prompt = Console.ReadLine()!;
+
+    var search = chatService.Search(prompt);
+    var conversation = chatService.CreateConversation(search);
+
+    Console.ForegroundColor = ConsoleColor.DarkCyan;
+    await foreach (var message in conversation.StreamResponseEnumerableFromChatbotAsync())
+    {
+	    Console.Write(message);
+    }
+
+    Console.WriteLine();
+}
+
+/*
 var edoc = JsonSerializer.Deserialize<EmbeddingDocument>(File.ReadAllText(jsonFilename));
 
 if (edoc is not null)
@@ -80,20 +101,22 @@ if (edoc is not null)
         chat.AppendUserInput($"Use the following information as context to answer my question:\n```\n{combined}\n```\n");
         chat.AppendUserInput(prompt);
 
-		/*
-        foreach (var result in results)
-		{
-			Console.WriteLine(result.Text);
-		}
-		**/
+        var totalTokens = chat.Messages.Sum(x => x.Content.Length) / 4;
+
+        if (totalTokens > 4000)
+        {
+	        Console.WriteLine("End of chat");
+	        break;
+        }
+
         await foreach (var message in chat.StreamResponseEnumerableFromChatbotAsync())
         {
             Console.Write(message);
         }
 
-        var totalTokens = chat.Messages.Sum(x => x.Content.Length) / 4;
+        totalTokens = chat.Messages.Sum(x => x.Content.Length) / 4;
 
-        if (totalTokens > 4000)
+        if (totalTokens > 3000)
         {
             Console.WriteLine("End of chat");
             break;
@@ -103,3 +126,4 @@ if (edoc is not null)
 		Console.ResetColor();
 	}
 }
+*/
