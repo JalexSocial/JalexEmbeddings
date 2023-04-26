@@ -45,7 +45,7 @@ public class EmbeddingBuilderService
         return doc;
     }
 
-    private float[] GetEmbeddings(string text)
+    public float[] GetEmbeddings(string text)
     {
         return _client.Embeddings.GetEmbeddingsAsync(text).Result ?? Array.Empty<float>();
     }
