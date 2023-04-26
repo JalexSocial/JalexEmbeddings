@@ -27,7 +27,7 @@ EmbeddingBuilderService embeddingBuilder = new EmbeddingBuilderService(client);
 if (!File.Exists(jsonFilename))
 {
 	var doc = embeddingBuilder.ConvertMarkdownToEmbeddingDocument("EAHS 2022–2023 Student–Parent Handbook", filename,
-		text, 150);
+		text, 500);
 
 	string jsonString = JsonSerializer.Serialize(doc, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
@@ -38,29 +38,51 @@ var edoc = JsonSerializer.Deserialize<EmbeddingDocument>(File.ReadAllText(jsonFi
 
 if (edoc is not null)
 {
-    client.Chat.DefaultChatRequestArgs.Temperature = 0.2;
+    client.Chat.DefaultChatRequestArgs.Temperature = 0.3;
     var chat = client.Chat.CreateConversation(client.Chat.DefaultChatRequestArgs);
-	chat.AppendSystemMessage(File.ReadAllText("systemprompt.txt"));
-	
-	while (true)
+
+    var prompts = File.ReadAllLines("systemprompt.txt").Where(x => !String.IsNullOrEmpty(x) && !x.StartsWith("##"));
+
+    foreach (var prompt in prompts)
+    {
+        chat.AppendSystemMessage(prompt);
+    }
+
+    while (true)
 	{
 		Console.Write("Ask a question: ");
 		string prompt = Console.ReadLine()!;
 
 		var promptEmbedding = embeddingBuilder.GetEmbeddings(prompt);
 
-		var fragments =
-			edoc.Fragments.OrderByDescending(x => promptEmbedding.CosineSimilarity(x.Embedding)).ToList();
+        var search = new EmbeddingSearch
+        {
+            Query = prompt,
+            Results = edoc.Fragments.Select(x => new EmbeddingSearchResult
+            {
+                Fragment = x,
+                Relevance = promptEmbedding.CosineSimilarity(x.Embedding)
+            }).OrderByDescending(x => x.Relevance).Take(15).ToList()
+        };
+
+        var fragments = search.Results.Select(x => x.Fragment);
 
 		Console.ForegroundColor = ConsoleColor.DarkCyan;
 
-		var results = fragments.Take(3).OrderBy(x => x.Sequence);
+		var results = fragments.Take(2).OrderBy(x => x.Sequence);
 
         var combined = String.Concat(results.Select(x => x.Text + "\n")).Replace("*","");
 
         chat.AppendUserInput($"Use the following information as context to answer my question:\n```\n{combined}\n```\n");
         chat.AppendUserInput(prompt);
 
+        var totalTokens = chat.Messages.Sum(x => x.Content.Length)/4;
+
+        if (totalTokens > 4000)
+        {
+            Console.WriteLine("End of chat");
+            break;
+        }
 		/*
         foreach (var result in results)
 		{

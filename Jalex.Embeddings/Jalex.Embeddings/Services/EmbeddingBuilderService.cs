@@ -1,4 +1,6 @@
 ﻿using Jalex.Embeddings.Models;
+using Markdig;
+using Markdig.Syntax;
 using Microsoft.SemanticKernel.SemanticFunctions.Partitioning;
 using OpenAI_API;
 
@@ -15,7 +17,8 @@ public class EmbeddingBuilderService
 
     public EmbeddingDocument ConvertMarkdownToEmbeddingDocument(string title, string filename, List<string> lines, int maxTokensPerParagraph = 350)
     {
-        var paragraphs = SemanticTextPartitioner.SplitMarkdownParagraphs(lines, maxTokensPerParagraph);
+        var markdown = SemanticTextPartitioner.SplitMarkDownLines(string.Join("\n", lines), 120);
+        var paragraphs = SemanticTextPartitioner.SplitMarkdownParagraphs(markdown, maxTokensPerParagraph);
 
         var doc = new EmbeddingDocument
         {
@@ -27,8 +30,8 @@ public class EmbeddingBuilderService
         for (int i = 0; i < paragraphs.Count; i++)
         {
             var text = paragraphs[i];
-            if (i > 0) text = paragraphs[i - 1] + "\n" + text;
-            if (i < paragraphs.Count - 1) text += "\n" + paragraphs[i + 1];
+            //if (i > 0) text = paragraphs[i - 1] + "\n" + text;
+            //if (i < paragraphs.Count - 1) text += "\n" + paragraphs[i + 1];
 
             var embedding = GetEmbeddings(text);
 
