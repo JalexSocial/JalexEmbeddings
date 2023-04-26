@@ -13,9 +13,9 @@ public class EmbeddingBuilderService
         _client = client;
     }
 
-    public EmbeddingDocument ConvertMarkdownToEmbeddingDocument(string title, string filename, List<string> lines, int maxTokensPerParagraph = 500)
+    public EmbeddingDocument ConvertMarkdownToEmbeddingDocument(string title, string filename, List<string> lines, int maxTokensPerParagraph = 350)
     {
-        var paragraphs = SemanticTextPartitioner.SplitMarkdownParagraphs(lines, 500);
+        var paragraphs = SemanticTextPartitioner.SplitMarkdownParagraphs(lines, maxTokensPerParagraph);
 
         var doc = new EmbeddingDocument
         {
@@ -26,7 +26,11 @@ public class EmbeddingBuilderService
 
         for (int i = 0; i < paragraphs.Count; i++)
         {
-            var embedding = GetEmbeddings(paragraphs[i]);
+            var text = paragraphs[i];
+            if (i > 0) text = paragraphs[i - 1] + "\n" + text;
+            if (i < paragraphs.Count - 1) text += "\n" + paragraphs[i + 1];
+
+            var embedding = GetEmbeddings(text);
 
             if (embedding.Length > 0)
             {
