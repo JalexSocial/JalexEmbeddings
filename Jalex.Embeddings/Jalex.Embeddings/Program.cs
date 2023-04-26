@@ -45,7 +45,11 @@ if (edoc is not null)
 
     foreach (var prompt in prompts)
     {
-        chat.AppendSystemMessage(prompt);
+        var p = prompt;
+        if (prompt.StartsWith("- "))
+            p = prompt.Substring(2);
+
+        chat.AppendSystemMessage(p);
     }
 
     while (true)
@@ -76,13 +80,6 @@ if (edoc is not null)
         chat.AppendUserInput($"Use the following information as context to answer my question:\n```\n{combined}\n```\n");
         chat.AppendUserInput(prompt);
 
-        var totalTokens = chat.Messages.Sum(x => x.Content.Length)/4;
-
-        if (totalTokens > 4000)
-        {
-            Console.WriteLine("End of chat");
-            break;
-        }
 		/*
         foreach (var result in results)
 		{
@@ -92,6 +89,14 @@ if (edoc is not null)
         await foreach (var message in chat.StreamResponseEnumerableFromChatbotAsync())
         {
             Console.Write(message);
+        }
+
+        var totalTokens = chat.Messages.Sum(x => x.Content.Length) / 4;
+
+        if (totalTokens > 4000)
+        {
+            Console.WriteLine("End of chat");
+            break;
         }
 
         Console.WriteLine("\n\n\n");
