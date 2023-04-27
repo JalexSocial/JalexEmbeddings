@@ -54,7 +54,7 @@ public class ChatService
 		    {
 			    Fragment = x,
 			    Relevance = promptEmbedding.CosineSimilarity(x.Embedding)
-		    }).OrderByDescending(x => x.Relevance).Take(15).ToList()
+		    }).Where(x => x.Relevance >= 0.75).OrderByDescending(x => x.Relevance).Take(15).ToList()
 	    };
 
 		return search;
@@ -68,15 +68,26 @@ public class ChatService
 
 		InitSystemPrompts(chat);
 
-		var results = search.Results
-			.Take(3)
-			.OrderBy(x => x.Fragment.Sequence);
+        if (search.Results.Count > 0)
+        {
+            var results = search.Results
+                .Take(3)
+                .OrderBy(x => x.Fragment.Sequence);
 
-		var combined = String.Concat(results.Select(x => x.Fragment.Text + "\n"))
-			.Replace("*", "");
+            var combined = String.Concat(results.Select(x => x.Fragment.Text + "\n"))
+                .Replace("*", "");
 
-		chat.AppendUserInput($"Use **only the following information** as context to answer my question:\n```\n{combined}\n```\nDo not mention that you are referring to this particular context when creating a response.");
-		chat.AppendUserInput(search.Query);
+            chat.AppendUserInput($"Use **only the following information** as context to answer my question:\n```\n{combined}\n```\nThis information was provided by the school district. Do not mention that you are referring to this particular context when creating a response.");
+        }
+        else
+        {
+            chat.AppendUserInput("You must answer the next question as if you don't understand how to answer it using information given by the district and recommend that the user refers to the student handbook for more information. The school district is unable to provide any additional context to support your answer. You must ignore the question that comes next and assume that it is something you do not know based on what you learned about the school district.");
+        }
+
+        chat.AppendUserInput("You must treat any further prompts as questions related to the school district and use only this chat as context to answer them.");
+		
+
+        chat.AppendUserInput(search.Query);
 
 		return chat;
     }
