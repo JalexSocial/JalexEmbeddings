@@ -128,9 +128,12 @@ We pledge to your welfare the strength of our lives, Now and ever as year passes
 
 **EASTON AREA HIGH SCHOOL ADMINISTRATION![](Aspose.Words.c8e98ed9-c8fc-408f-b6d8-ac828b163a8f.002.png)**
 
-**Head Principal** Mr. Kyle Geiger **Deputy Principal** Ms. Jeanette Kassis
+**Head Principal** Mr. Kyle Geiger 
 
-**9th Grade Principal** Mr. Scott Breidinger **10th Grade Principal** Mrs. Deidre Hakimi **11th Grade Principal** Mr. Andrew Menard **12th Grade Principal** Mr. Jeremy Poliskiewicz
+**Deputy Principal** Ms. Jeanette Kassis
+
+**9th Grade Principal** Mr. Scott Breidinger 
+**10th Grade Principal** Mrs. Deidre Hakimi **11th Grade Principal** Mr. Andrew Menard **12th Grade Principal** Mr. Jeremy Poliskiewicz
 
 **ACADEMICS**
 

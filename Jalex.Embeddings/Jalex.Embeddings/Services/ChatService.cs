@@ -63,18 +63,19 @@ public class ChatService
     public Conversation CreateConversation(EmbeddingSearch search)
     {
 	    _client.Chat.DefaultChatRequestArgs.Temperature = 0.3;
+
 	    var chat = _client.Chat.CreateConversation(_client.Chat.DefaultChatRequestArgs);
 
 		InitSystemPrompts(chat);
 
 		var results = search.Results
-			.Take(2)
+			.Take(3)
 			.OrderBy(x => x.Fragment.Sequence);
 
 		var combined = String.Concat(results.Select(x => x.Fragment.Text + "\n"))
 			.Replace("*", "");
 
-		chat.AppendUserInput($"Use **only the following information** as context to answer my question:\n```\n{combined}\n```\n");
+		chat.AppendUserInput($"Use **only the following information** as context to answer my question:\n```\n{combined}\n```\nDo not mention that you are referring to this particular context when creating a response.");
 		chat.AppendUserInput(search.Query);
 
 		return chat;
@@ -89,6 +90,7 @@ public class ChatService
 			    p = prompt.Substring(2);
 
 		    chat.AppendSystemMessage(p);
-	    }
+		    //chat.AppendUserInput(p);
+        }
     }
 }

@@ -7,6 +7,7 @@ using Jalex.Embeddings.Models;
 using Microsoft.SemanticKernel.AI.ChatCompletion;
 using Microsoft.SemanticKernel.AI.Embeddings.VectorOperations;
 using OpenAI_API.Chat;
+using System;
 
 var builder = new ConfigurationBuilder()
     .AddUserSecrets(typeof(Secrets).Assembly);
@@ -42,7 +43,13 @@ while (true)
     Console.Write("Ask a question: ");
 	string prompt = Console.ReadLine()!;
 
+    // List one thing I would need to look for in a student handbook to find the answer to the question "{prompt}" Please be very brief and state only the subject matter.
+    //var result = await client.Chat.CreateChatCompletionAsync($"List what I would need to look for in a student handbook to find the answer to the prompt: \"{prompt}\". Please be brief and limit your response to at most 20 words.");
+
+    //var alternatePrompt = result.Choices[0].Message.Content;
+
     var search = chatService.Search(prompt);
+
     var conversation = chatService.CreateConversation(search);
 
     Console.ForegroundColor = ConsoleColor.DarkCyan;
@@ -50,6 +57,9 @@ while (true)
     {
 	    Console.Write(message);
     }
+
+    var totalTokens = conversation.Messages.Sum(x => x.Content.Length) / 4;
+    var usage = conversation.MostResentAPIResult.Usage;
 
     Console.WriteLine("\n");
 }
