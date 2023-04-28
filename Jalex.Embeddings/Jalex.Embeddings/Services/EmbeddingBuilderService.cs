@@ -30,8 +30,6 @@ public class EmbeddingBuilderService
         for (int i = 0; i < paragraphs.Count; i++)
         {
             var text = paragraphs[i];
-            //if (i > 0) text = paragraphs[i - 1] + "\n" + text;
-            //if (i < paragraphs.Count - 1) text += "\n" + paragraphs[i + 1];
 
             var embedding = GetEmbeddings(text);
 
@@ -46,7 +44,6 @@ public class EmbeddingBuilderService
                     Embedding = embedding
                 });
             }
-
         }
 
         return doc;

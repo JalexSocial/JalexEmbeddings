@@ -86,7 +86,6 @@ public class ChatService
 
         chat.AppendUserInput("You must treat any further prompts as questions related to the school district and use only this chat as context to answer them.");
 		
-
         chat.AppendUserInput(search.Query);
 
 		return chat;
